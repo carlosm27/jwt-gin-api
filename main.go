@@ -19,13 +19,18 @@ func main() {
 
 	db := DbInit()
 
-	models.RepoInterface(db)
+	server := handlers.NewServer(db)
 
 	r := gin.Default()
 
 	group := r.Group("/api")
 
-	group.POST("/register", handlers.Register)
+	group.POST("/register", server.Register)
+	group.POST("/login", server.Login)
+
+	protectedEndpoints := r.Group("/api/admin")
+	protectedEndpoints.Use(JwtAuthMiddleware())
+	protectedEndpoints.GET("/user", server.CurrentUser)
 
 	if r.Run(":"+port) != nil {
 		log.Printf("Error running at port: %s", port)
