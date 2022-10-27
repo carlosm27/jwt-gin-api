@@ -1,4 +1,4 @@
-package handlers
+package main
 
 import (
 	"github.com/carlosm27/jwtGinApi/models"
@@ -33,7 +33,7 @@ func (s *Server) Register(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	user := models.User{Username: input.Username, Password: input.Password}
 
 	if err := s.db.Create(&user).Error; err != nil {
