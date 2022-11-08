@@ -40,7 +40,7 @@ func (s *Server) Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User created"})
+	c.JSON(http.StatusCreated, gin.H{"message": "User created"})
 }
 
 func (s *Server) Login(c *gin.Context) {
