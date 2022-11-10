@@ -2,7 +2,7 @@ package models
 
 import (
 	"errors"
-	"github.com/carlosm27/jwtGinApi/utils"
+	
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"html"
@@ -32,38 +32,9 @@ func VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func LoginCheck(username, password string) (string, error) {
-	var err error
 
-	user := User{}
 
-	db, err := Setup()
-	if err != nil {
-		log.Println(err)
-		return "", err
-	}
-
-	if err = db.Model(User{}).Where("username=?", username).Take(&user).Error; err != nil {
-		return "", err
-	}
-
-	err = VerifyPassword(password, user.Password)
-
-	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
-		return "", err
-	}
-
-	token, err := utils.GenerateToken(user.ID)
-
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
-
-}
-
-func GetUserByID(uid uint) (User, error) {
+func GetUserById(uid uint) (User, error) {
 	var user User
 
 	db, err := Setup()
