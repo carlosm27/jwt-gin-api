@@ -46,5 +46,5 @@ func (s *Server) PostGrocery(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusOK, newGrocery)
+    c.JSON(http.StatusCreated, newGrocery)
 }
