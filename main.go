@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/carlosm27/jwtGinApi/models"
+	"github.com/carlosm27/jwtGinApi/handlers"
+	"github.com/carlosm27/jwtGinApi/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
@@ -36,7 +38,7 @@ func SetupRouter() *gin.Engine {
 
 	db := DbInit()
 
-	server := NewServer(db)
+	server := handlers.NewServer(db)
 
 	group := r.Group("/api")
 
@@ -44,8 +46,9 @@ func SetupRouter() *gin.Engine {
 	group.POST("/login", server.Login)
 
 	protectedEndpoints := r.Group("/api/admin")
-	protectedEndpoints.Use(JwtAuthMiddleware())
-	protectedEndpoints.GET("/user", server.CurrentUser)
+	protectedEndpoints.Use(middleware.JwtAuthMiddleware())
+	protectedEndpoints.GET("/groceries", server.GetGroceries)
+	protectedEndpoints.POST("/grocery", server.PostGrocery)
 
 	return r
 
