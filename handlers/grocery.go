@@ -2,6 +2,7 @@ package handlers
 
 import (
     "github.com/carlosm27/jwtGinApi/models"
+    "github.com/carlosm27/jwtGinApi/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 
@@ -17,34 +18,40 @@ type NewGrocery struct {
 
 func (s *Server) GetGroceries(c *gin.Context) {
 
-    var groceries []models.Grocery
+    user, err := utils.CurrentUser(c)
 
-
-    if err := s.db.Find(&groceries).Error; err != nil {
-        c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-    c.JSON(http.StatusOK, groceries)
+
+    c.JSON(http.StatusOK, gin.H{"data": user.Groceries})
 
 }
 
 
 func (s *Server) PostGrocery(c *gin.Context) {
 
-    var grocery NewGrocery
+    var grocery models.Grocery
 
     if err := c.ShouldBindJSON(&grocery); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
 
-    newGrocery := models.Grocery{Name: grocery.Name, Quantity: grocery.Quantity}
+    user, err := utils.CurrentUser(c)
+    if err != nil {
 
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
-    if err := s.db.Create(&newGrocery).Error; err != nil {
+    grocery.UserId = user.ID
+
+    if err := s.db.Create(&grocery).Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
 
-    c.JSON(http.StatusCreated, newGrocery)
+    c.JSON(http.StatusCreated, grocery)
 }
