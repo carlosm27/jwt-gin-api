@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"gorm.io/gorm"
-	"fmt"
 	"log"
 	"net/http"
 	"golang.org/x/crypto/bcrypt"
@@ -55,13 +54,12 @@ func (s *Server) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(input)
+	
 
 	user := models.User{Username: input.Username, Password: input.Password}
 
 	token, err := s.LoginCheck(user.Username, user.Password)
 
-	fmt.Println(user)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "The username or password is not correct"})
