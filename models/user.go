@@ -13,7 +13,8 @@ import (
 type User struct {
 	gorm.Model
 	Username string `gorm:"size:255;not null;unique" json:"username"`
-	Password string `gorm:"size:255;not null;" json:"password"`
+	Password string `gorm:"size:255;not null;" json:"-"`
+	Groceries []Grocery
 }
 
 func (user *User) HashPassword() error {
@@ -43,11 +44,10 @@ func GetUserById(uid uint) (User, error) {
 		log.Println(err)
 		return User{}, err
 	}
-	if err := db.First(&user, uid).Error; err != nil {
+	if err := db.Preload("Groceries").Where("id=?", uid).Find(&user).Error; err != nil {
 		return user, errors.New("user not found")
 
 	}
-	user.Password = ""
 
 	return user, nil
 }
