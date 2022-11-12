@@ -20,9 +20,8 @@ func main() {
 
 	r := SetupRouter()
 
-	if r.Run(":"+port) != nil {
-		log.Printf("Error running at port: %s", port)
-	}
+	log.Fatal(r.Run(":"+port))
+		
 }
 
 func DbInit() *gorm.DB {
