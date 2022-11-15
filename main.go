@@ -39,15 +39,15 @@ func SetupRouter() *gin.Engine {
 
 	server := handlers.NewServer(db)
 
-	group := r.Group("/api")
+	router := r.Group("/api")
 
-	group.POST("/register", server.Register)
-	group.POST("/login", server.Login)
+	router.POST("/register", server.Register)
+	router.POST("/login", server.Login)
 
-	protectedEndpoints := r.Group("/api/admin")
-	protectedEndpoints.Use(middleware.JwtAuthMiddleware())
-	protectedEndpoints.GET("/groceries", server.GetGroceries)
-	protectedEndpoints.POST("/grocery", server.PostGrocery)
+	authorized := r.Group("/api/admin")
+	authorized.Use(middleware.JwtAuthMiddleware())
+	authorized.GET("/groceries", server.GetGroceries)
+	authorized.POST("/grocery", server.PostGrocery)
 
 	return r
 
