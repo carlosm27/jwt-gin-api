@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"golang.org/x/crypto/bcrypt"
+	
 )
 
 type RegisterInput struct {
@@ -38,7 +39,10 @@ func (s *Server) Register(c *gin.Context) {
 		return
 	}
 
+	
+
 	user := models.User{Username: input.Username, Password: input.Password}
+	user.HashPassword()
 
 	if err := s.db.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -46,6 +50,7 @@ func (s *Server) Register(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"user":user,"message": "User created"})
 }
+
 
 func (s *Server) Login(c *gin.Context) {
 	var input LoginInput
@@ -121,4 +126,17 @@ func (s *Server)LoginCheck(username, password string) (string, error) {
 
 	return token, nil
 
+}
+
+func (s *Server) GetUserById(c *gin.Context	)  {
+	var user models.User
+
+
+	if err := s.db.Model(models.User{}).Where("ID=?", c.Param("id")).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success", "data": user})
 }
