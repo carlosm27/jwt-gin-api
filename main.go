@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/carlosm27/jwtGinApi/models"
-	"github.com/carlosm27/jwtGinApi/handlers"
-	"github.com/carlosm27/jwtGinApi/middleware"
+	"log"
+	"os"
+
+	"github.com/carlosm27/jwt-gin-api/handlers"
+	"github.com/carlosm27/jwt-gin-api/middleware"
+	"github.com/carlosm27/jwt-gin-api/models"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
-	"log"
-	"os"
 )
 
 func main() {
@@ -20,8 +21,8 @@ func main() {
 
 	r := SetupRouter()
 
-	log.Fatal(r.Run(":"+port))
-		
+	log.Fatal(r.Run(":" + port))
+
 }
 
 func DbInit() *gorm.DB {

@@ -1,16 +1,15 @@
 package handlers
 
 import (
-
-	"github.com/carlosm27/jwtGinApi/models"
-	"github.com/carlosm27/jwtGinApi/utils"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
+
+	"github.com/carlosm27/jwt-gin-api/models"
+	"github.com/carlosm27/jwt-gin-api/utils"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
-	
+	"gorm.io/gorm"
 )
 
 type RegisterInput struct {
@@ -39,8 +38,6 @@ func (s *Server) Register(c *gin.Context) {
 		return
 	}
 
-	
-
 	user := models.User{Username: input.Username, Password: input.Password}
 	user.HashPassword()
 
@@ -48,9 +45,8 @@ func (s *Server) Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"user":user,"message": "User created"})
+	c.JSON(http.StatusCreated, gin.H{"user": user, "message": "User created"})
 }
-
 
 func (s *Server) Login(c *gin.Context) {
 	var input LoginInput
@@ -59,12 +55,10 @@ func (s *Server) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
 
 	user := models.User{Username: input.Username, Password: input.Password}
 
 	token, err := s.LoginCheck(user.Username, user.Password)
-
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "The username or password is not correct"})
@@ -88,11 +82,9 @@ func (s *Server) CurrentUser(c *gin.Context) {
 	}
 	claims, _ := token.Claims.(jwt.MapClaims)
 
-	
 	userId := uint(claims["id"].(float64))
 
 	user, err := models.GetUserById(userId)
-
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -101,12 +93,10 @@ func (s *Server) CurrentUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Success", "data": user})
 }
 
-func (s *Server)LoginCheck(username, password string) (string, error) {
+func (s *Server) LoginCheck(username, password string) (string, error) {
 	var err error
 
 	user := models.User{}
-
-	
 
 	if err = s.db.Model(models.User{}).Where("username=?", username).Take(&user).Error; err != nil {
 		return "", err
@@ -128,9 +118,8 @@ func (s *Server)LoginCheck(username, password string) (string, error) {
 
 }
 
-func (s *Server) GetUserById(c *gin.Context	)  {
+func (s *Server) GetUserById(c *gin.Context) {
 	var user models.User
-
 
 	if err := s.db.Model(models.User{}).Where("ID=?", c.Param("id")).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})

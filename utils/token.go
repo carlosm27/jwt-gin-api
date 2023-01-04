@@ -3,14 +3,14 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"github.com/carlosm27/jwtGinApi/models"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	"os"
 	"strconv"
 	"strings"
 	"time"
-	
+
+	"github.com/carlosm27/jwt-gin-api/models"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 var privateKey = []byte(os.Getenv("API_SECRET"))
@@ -33,8 +33,7 @@ func GenerateToken(user models.User) (string, error) {
 
 }
 
-
-func ValidateToken (c *gin.Context) error {
+func ValidateToken(c *gin.Context) error {
 	token, err := GetToken(c)
 
 	if err != nil {
@@ -51,33 +50,31 @@ func ValidateToken (c *gin.Context) error {
 
 func CurrentUser(c *gin.Context) (models.User, error) {
 	err := ValidateToken(c)
-    if err != nil {
-        return models.User{}, err
-    }
-    token, _ := GetToken(c)
-    claims, _ := token.Claims.(jwt.MapClaims)
-    userId := uint(claims["id"].(float64))
+	if err != nil {
+		return models.User{}, err
+	}
+	token, _ := GetToken(c)
+	claims, _ := token.Claims.(jwt.MapClaims)
+	userId := uint(claims["id"].(float64))
 
-    user, err := models.GetUserById(userId)
-    if err != nil {
-        return models.User{}, err
-    }
-    return user, nil
+	user, err := models.GetUserById(userId)
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
 }
-
 
 func GetToken(c *gin.Context) (*jwt.Token, error) {
 	tokenString := getTokenFromRequest(c)
-    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-        }
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
 
-        return privateKey, nil
-    })
-    return token, err
+		return privateKey, nil
+	})
+	return token, err
 }
-
 
 func getTokenFromRequest(c *gin.Context) string {
 	bearerToken := c.Request.Header.Get("Authorization")
